@@ -35,6 +35,7 @@ export const AnimalForm = () => {
     }, [])
 
     const constructNewAnimal = () => {
+        // debugger
         const locationId = parseInt(animal.locationId)
 
         if (locationId === 0) {
@@ -46,9 +47,9 @@ export const AnimalForm = () => {
                     id: animal.id,
                     name: animal.name,
                     breed: animal.breed,
-                    locationId: locationId,
-                    treatment: animal.treatment,
-                    customerId: parseInt(localStorage.getItem("kennel_customer"))
+                    status: animal.treatment,
+                    location_id: locationId,
+                    customer_id: parseInt(localStorage.getItem("kennel_customer"))
                 })
                     .then(() => history.push("/animals"))
             } else {
@@ -56,9 +57,9 @@ export const AnimalForm = () => {
                 addAnimal({
                     name: animal.name,
                     breed: animal.breed,
-                    locationId: locationId,
-                    treatment: animal.treatment,
-                    customerId: parseInt(localStorage.getItem("kennel_customer"))
+                    status: animal.treatment,
+                    location_id: locationId,
+                    customer_id: parseInt(localStorage.getItem("kennel_customer"))
                 })
                     .then(() => history.push("/animals"))
             }
