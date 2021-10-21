@@ -47,7 +47,7 @@ export const AnimalForm = () => {
                     id: animal.id,
                     name: animal.name,
                     breed: animal.breed,
-                    status: animal.treatment,
+                    status: animal.status,
                     location_id: locationId,
                     customer_id: parseInt(localStorage.getItem("kennel_customer"))
                 })
@@ -57,7 +57,7 @@ export const AnimalForm = () => {
                 addAnimal({
                     name: animal.name,
                     breed: animal.breed,
-                    status: animal.treatment,
+                    status: animal.status,
                     location_id: locationId,
                     customer_id: parseInt(localStorage.getItem("kennel_customer"))
                 })
