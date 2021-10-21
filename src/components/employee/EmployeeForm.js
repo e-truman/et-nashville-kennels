@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react"
-import { useHistory } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { addEmployee } from "./EmployeeManager"
 import { getLocations } from "../location/LocationManager"
 import { getAnimals } from "../animal/AnimalManager"
@@ -9,41 +9,70 @@ export const EmployeeForm = () => {
     const name = useRef(null)
     const location = useRef(null)
     const animal = useRef(null)
-
+    const { employeeId } = useParams()
     const history = useHistory()
-
+    const [employee, setEmployee] = useState({})
+    const [employees, setEmployees] = useState({})
     const [animals, setAnimals] = useState([])
     const [locations, setLocations] = useState([])
+
+
+    const editMode = employeeId ? true : false  // true or false
+
+    const handleControlledInputChange = (event) => {
+        /*
+            When changing a state object or array, always create a new one
+            and change state instead of modifying current one
+        */
+        const newEmployee = Object.assign({}, employee)          // Create copy
+        newEmployee[event.target.name] = event.target.value    // Modify copy
+        setEmployee(newEmployee)                                 // Set copy as new state
+    }
 
     /*
         Get animal state and location state on initialization.
     */
-    useEffect(() => {
-       getAnimals().then(animalsData => setAnimals(animalsData))
-       getLocations().then(locationsData => setLocations(locationsData))
-    }, [])
+        useEffect(() => {
+            if (editMode) {
+                getEmployeeById(employeeId).then((res) => {
+                    setEmployee(res)
+                })
+            }
+            getLocations().then(locationsData => setLocations(locationsData))
+        }, [])
+
+
 
     const constructNewEmployee = () => {
-        /*
-            The `location` and `animal` variables below are
-            the references attached to the input fields. You
-            can't just ask for the `.value` property directly,
-            but rather `.current.value` now in React.
-        */
-        const locationId = parseInt(location.current.value)
-        const animalId = parseInt(animal.current.value)
-
-        if (locationId === 0) {
-            window.alert("Please select a location")
-        } else {
-            addEmployee({
-                name: name.current.value,
-                locationId,
-                animalId
-            })
-            .then(() => history.push("/employees"))
+            // debugger
+            const locationId = parseInt(employee.locationId)
+    
+            if (locationId === 0) {
+                window.alert("Please select a location")
+            } else {
+                if (editMode) {
+                    // PUT
+                    updateEmployee({
+                        id: employee.id,
+                        name: employee.name,
+                        address: employee.address,
+                        location_id: employee.location_id
+                    })
+                        .then(() => history.push("/employees"))
+                } else {
+                    // POST
+                    addEmployee({
+                        id: employee.id,
+                        name: employee.name,
+                        address: employee.address,
+                        location_id: employee.location_id
+                    })
+                        .then(() => history.push("/employees"))
+                }
+            }
         }
-    }
+        
+    
 
     return (
         <form className="employeeForm">
@@ -51,13 +80,21 @@ export const EmployeeForm = () => {
             <fieldset>
                 <div className="form-group">
                     <label htmlFor="employeeName">Employee name: </label>
-                    <input type="text" id="employeeName" ref={name} required autoFocus className="form-control" placeholder="Employee name" />
+                    <input type="text" id="employeeName" ref={name} required autoFocus className="form-control" placeholder="Employee name" defaultValue={employee.name}
+                        onChange={handleControlledInputChange}/>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div className="form-group">
+                    <label htmlFor="employeeName">Employee address: </label>
+                    <input type="text" id="employeeAddress" ref={name} required autoFocus className="form-control" placeholder="Employee address" defaultValue={employee.address}
+                        onChange={handleControlledInputChange}/>
                 </div>
             </fieldset>
             <fieldset>
                 <div className="form-group">
                     <label htmlFor="location">Assign to location: </label>
-                    <select defaultValue="" name="location" ref={location} id="employeeLocation" className="form-control" >
+                    <select  value={employee.location_id} name="location" ref={location} id="employeeLocation" className="form-control" onChange={handleControlledInputChange}>
                         <option value="0">Select a location</option>
                         {locations.map(e => (
                             <option key={e.id} value={e.id}>
